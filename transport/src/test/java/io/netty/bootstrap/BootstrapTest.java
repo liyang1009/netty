@@ -43,6 +43,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -307,6 +308,22 @@ public class BootstrapTest {
                         public void run() {
                             if (success) {
                                 promise.setSuccess(unresolvedAddress);
+                            } else {
+                                promise.setFailure(new UnknownHostException());
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                protected void doResolveAll(
+                        final SocketAddress unresolvedAddress, final Promise<List<SocketAddress>> promise)
+                        throws Exception {
+                    executor().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (success) {
+                                promise.setSuccess(Collections.singletonList(unresolvedAddress));
                             } else {
                                 promise.setFailure(new UnknownHostException());
                             }
